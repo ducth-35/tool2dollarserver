@@ -14,5 +14,9 @@
     "express": "^4.17.1",
     "hbs": "^4.1.1",
     "mongoose": "^5.9.16"
+  },
+
+  "scripts": {
+    "start": "node index.js"
   }
 }
