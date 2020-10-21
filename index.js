@@ -4,6 +4,7 @@ let hbs = require('hbs')
 const path = require('path')
 const bodyParser = require('body-parser');
 let mongoose = require('mongoose')
+const googleTrends = require('google-trends-api');
 mongoose.connect('mongodb+srv://admin:phongdepzai123@cluster0-g0afi.mongodb.net/assignment', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -37,6 +38,20 @@ app.post('/addCcv', async (req, res) => {
         res.send(500,'Có lỗi xảy ra' + e)
     }
 })
+app.get('/', async (req, res) => {
+    googleTrends.dailyTrends({
+    trendDate: new Date(),
+    geo: req.query.countryCode,
+}, function(err, results) {
+    if (err) {
+        console.log(err)
+        res.send(err)
+    }else{
+        console.log(results);
+        res.send(results)
+    }
+});
+})
 app.post('/login', async (req, res) => {
     let isExisted = await KeyCode.find({keycode: req.body.keycode})
     if(isExisted.length!=0){
@@ -69,4 +84,5 @@ app.post('/logout', async (req, res) => {
         res.send(200,"Thành công !")
     }
 })
+
 app.listen(process.env.PORT||9000)
