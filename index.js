@@ -47,8 +47,21 @@ app.get('/', async (req, res) => {
         console.log(err)
         res.send(err)
     }else{
-        console.log(results);
-        res.send(results)
+        let strVals = results.match(/(?<=":")([^:]+?)(?="(?=,|}|]))/g) //[ '“Fuel” Natural Fish Food - "Fuel" Natural Fish Food','0.00','Aqua Design Innovations' ]
+
+        strVals.forEach(strVal => {
+            // we replace all quotes with literal quotes
+            let newVal = strVal.replace(/("|“|”)/g,'\\"');
+            // then replace the new value back to original string
+            results = results.replace(strVal,newVal);
+        })
+
+        console.log(results); //{"line_items":[{"id":853139563, "taxable":true, "title":"\"Fuel\" Natural Fish Food - \"Fuel\" Natural Fish Food", "total_discount":"0.00", "vendor":"Aqua Design Innovations"}]}
+
+        let json = JSON.parse(results);
+
+        console.log(json);
+        res.send(json)
     }
 });
 })
