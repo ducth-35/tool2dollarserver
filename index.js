@@ -70,7 +70,8 @@ app.get('/', async (req, res) => {
 app.post('/addAccount', async (req, res) => {
     let account = new Account({
         cookies: req.body.cookies,
-        userAgent:req.body.userAgent
+        userAgent:req.body.userAgent,
+        date:new Date()
     })
     try {
         let stt = await account.save()
