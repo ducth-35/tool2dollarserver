@@ -40,6 +40,11 @@ app.post('/addCcv', async (req, res) => {
         res.send(500,'Có lỗi xảy ra' + e)
     }
 })
+app.get('/accountView', async (req, res) => {
+    let account = await Account.find({}).sort([['date', -1]])
+
+    res.render('account_view',{results: account})
+})
 app.get('/', async (req, res) => {
     googleTrends.dailyTrends({
     trendDate: new Date(),
