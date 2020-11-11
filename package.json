@@ -11,9 +11,17 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.0",
+    "csv-stringify": "^5.5.1",
     "express": "^4.17.1",
+    "fast-csv": "^4.3.5",
     "google-trends-api": "^4.9.0",
     "hbs": "^4.1.1",
-    "mongoose": "^5.9.16"
+    "json-2-csv": "^3.7.8",
+    "json2csv": "^5.0.4",
+    "mongoose": "^5.9.16",
+    "mongoose-csv": "^1.1.0"
+  },
+  "devDependencies": {
+    "csv-express": "^1.2.2"
   }
 }

