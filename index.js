@@ -55,7 +55,7 @@ function transform(doc){
     };
 }
 app.get('/getCSV', async (req, res) => {
-    let cursor = await Account.find().lean().sort([['date', -1]])
+    let cursor = await Account.find().lean().sort([['_id', -1]])
 
     converter.json2csv(cursor, (err, csv) => {
         if (err) {
@@ -68,7 +68,7 @@ app.get('/getCSV', async (req, res) => {
     });
 })
 app.get('/accountView', async (req, res) => {
-    let account = await Account.find({}).sort([['date', -1]])
+    let account = await Account.find({}).sort([["_id", -1]])
     console.log(typeof account)
     res.render('account_view',{results: account})
 })
