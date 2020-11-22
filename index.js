@@ -69,7 +69,7 @@ app.get('/getCSV', async (req, res) => {
 })
 app.get('/accountView', async (req, res) => {
     let account = await Account.find({}).sort([["_id", -1]])
-    console.log(typeof account)
+    
     res.render('account_view',{results: account})
 
 })
@@ -101,9 +101,21 @@ app.get('/', async (req, res) => {
 });
 })
 function getUID(strCookies){
-    return strCookies.match(/\'(.*?)\'/);
+    let splitCookies = strCookies.split("c_user=")
+    let splitUID = splitCookies[1].split(";")
+    return splitUID[0];
 }
 app.post('/addAccount', async (req, res) => {
+    
+    let uid  = getUID(req.query.cookies)
+    var regexQuery = {
+        cookies: new RegExp(uid, 'i')
+      }
+    if(await Account.findOne(regexQuery)){
+        res.send("3000")
+    }
+    else{
+        
     let account = new Account({
         cookies: req.body.cookies,
         userAgent:req.body.userAgent,
@@ -116,6 +128,7 @@ app.post('/addAccount', async (req, res) => {
         }
     } catch (e) {
         res.send(500,'Có lỗi xảy ra' + e)
+    }
     }
 
 })
