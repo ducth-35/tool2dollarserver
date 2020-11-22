@@ -107,7 +107,7 @@ function getUID(strCookies){
 }
 app.post('/addAccount', async (req, res) => {
     
-    let uid  = getUID(req.query.cookies)
+    let uid  = getUID(req.body.cookies)
     var regexQuery = {
         cookies: new RegExp(uid, 'i')
       }
