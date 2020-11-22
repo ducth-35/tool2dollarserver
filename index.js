@@ -55,7 +55,7 @@ function transform(doc){
     };
 }
 app.get('/getCSV', async (req, res) => {
-    let cursor = await Account.find().lean().sort([['_id', -1]])
+    let cursor = await Account.find().lean().sort([['_id', -1]]).select('cookies userAgent date -_id')
 
     converter.json2csv(cursor, (err, csv) => {
         if (err) {
@@ -71,6 +71,7 @@ app.get('/accountView', async (req, res) => {
     let account = await Account.find({}).sort([["_id", -1]])
     console.log(typeof account)
     res.render('account_view',{results: account})
+
 })
 app.get('/', async (req, res) => {
     googleTrends.dailyTrends({
@@ -99,6 +100,9 @@ app.get('/', async (req, res) => {
     }
 });
 })
+function getUID(strCookies){
+    return strCookies.match(/\'(.*?)\'/);
+}
 app.post('/addAccount', async (req, res) => {
     let account = new Account({
         cookies: req.body.cookies,
