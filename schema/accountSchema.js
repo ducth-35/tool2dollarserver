@@ -11,6 +11,10 @@ let accountSchema = new mongoose.Schema({
     date:{
         type:String,
         required:true
+    },
+    packageName:{
+        type:String,
+        required:true
     }
 })
 module.exports = accountSchema

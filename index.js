@@ -65,7 +65,7 @@ function transform(doc){
 }
 app.get('/getCSV', async (req, res) => {
     if(req.session.keycode){
-        let cursor = await Account.find().lean().sort([['_id', -1]]).select('cookies userAgent date -_id')
+        let cursor = await Account.find().lean().sort([['_id', -1]]).select('cookies userAgent date packageName -_id')
 
     converter.json2csv(cursor, (err, csv) => {
         if (err) {
@@ -139,7 +139,38 @@ app.post('/addAccount', async (req, res) => {
     let account = new Account({
         cookies: req.body.cookies,
         userAgent:req.body.userAgent,
-        date:new Date()
+        date:new Date(),
+        packageName:" "
+    })
+    try {
+        let stt = await account.save()
+        if (stt != null) {
+            res.send(200,"Thêm thành công !")
+        }
+    } catch (e) {
+        res.send(500,'Có lỗi xảy ra' + e)
+    }
+    }
+
+})
+
+app.post('/addAccountWithPackage', async (req, res) => {
+    
+    let uid  = getUID(req.body.cookies)
+    console.log(uid)
+    var regexQuery = {
+        cookies: new RegExp(uid, 'i')
+      }
+    if(await Account.findOne(regexQuery)){
+        res.send("3000")
+    }
+    else{
+        
+    let account = new Account({
+        cookies: req.body.cookies,
+        userAgent:req.body.userAgent,
+        date:new Date(),
+        packageName: req.body.packageName
     })
     try {
         let stt = await account.save()
