@@ -11,7 +11,7 @@ let mongoose = require('mongoose')
 const googleTrends = require('google-trends-api');
 
 var session = require('express-session');
-mongoose.connect('mongodb+srv://admin:phongdepzai123@cluster0-g0afi.mongodb.net/assignment', {
+mongoose.connect('mongodb+srv://dev123:y36V4VHr7sXTDdYm@cluster0.9xl6x.mongodb.net/data', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false
